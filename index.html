@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI问答助手</title>
+    <style>
+        body { max-width: 800px; margin: 20px auto; padding: 20px; font-family: Arial, sans-serif; }
+        .container { display: flex; flex-direction: column; gap: 15px; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 12px 24px; background: #10a37f; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .answer { padding: 15px; background: #f5f5f5; border-radius: 4px; white-space: pre-wrap; }
+        .loading { display: none; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI问答助手</h1>
+        <div class="config-section">
+            <input type="text" id="apiKey" placeholder="API密钥（可选）" class="config-input">
+            <input type="text" id="baseUrl" placeholder="API地址（可选）" class="config-input">
+            <input type="text" id="model" placeholder="模型名称（可选）" class="config-input">
+        </div>
+        <textarea id="question" placeholder="输入您的问题..."></textarea>
+        <button onclick="askQuestion()">提交问题</button>
+        <div class="loading" id="loading">正在获取答案...</div>
+        <div class="answer" id="answer"></div>
+    </div>
+
+    <script>
+        async function askQuestion() {
+            const question = document.getElementById('question').value;
+            const answerDiv = document.getElementById('answer');
+            const loading = document.getElementById('loading');
+            
+            if (!question) {
+                alert('请输入问题');
+                return;
+            }
+
+            try {
+                loading.style.display = 'block';
+                answerDiv.textContent = '';
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        question,
+                        systemPrompt: "作为资深简历提升官，使用STAR原则（情境-Situation、任务-Task、行动-Action、结果-Result）优化以下简历内容，保持语言平实，符合岗位实际，避免行业术语，输出完整自然段：",
+                        apiKey: document.getElementById('apiKey').value,
+                        baseUrl: document.getElementById('baseUrl').value,
+                        model: document.getElementById('model').value
+                    })
+                });
+
+                const data = await response.json();
+                answerDiv.textContent = data.answer;
+            } catch (error) {
+                answerDiv.textContent = '请求失败: ' + error.message;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

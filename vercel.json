@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/chat.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "OPENAI_API_KEY": "@openai_api_key",
+    "OPENAI_API_ENDPOINT": "@openai_api_endpoint"
+  }
+}
