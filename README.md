@@ -6,7 +6,7 @@
 ## 部署步骤
 
 ### 1. Vercel一键部署
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-repo-url)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Qianxia666/Resume-optimization)
 
 ### 2. 环境变量配置
 在Vercel项目设置中添加以下环境变量：
