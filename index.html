@@ -2,65 +2,941 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>AI问答助手</title>
+    <title>AI简历优化助手</title>
     <style>
-        body { max-width: 800px; margin: 20px auto; padding: 20px; font-family: Arial, sans-serif; }
-        .container { display: flex; flex-direction: column; gap: 15px; }
-        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 12px 24px; background: #10a37f; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .answer { padding: 15px; background: #f5f5f5; border-radius: 4px; white-space: pre-wrap; }
-        .loading { display: none; color: #666; }
+        :root {
+            --primary-color: #212121;
+            --primary-dark: #000000;
+            --secondary-color: #424242;
+            --accent-color: #757575;
+            --success-color: #2e7d32;
+            --warning-color: #c62828;
+            --light-bg: #f5f5f5;
+            --dark-text: #212121;
+            --light-text: #ffffff;
+            --gray-text: #757575;
+            --card-bg: #ffffff;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            --animation-duration: 0.3s;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-color);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.4rem;
+            margin-bottom: 16px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        h3 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 16px 0 8px;
+            font-size: 1.1rem;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all var(--animation-duration) ease;
+            resize: vertical;
+            background-color: #fff;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(117, 117, 117, 0.1);
+        }
+        
+        button {
+            padding: 14px 28px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--animation-duration) ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity var(--animation-duration) ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--secondary-color);
+        }
+        
+        button:hover::after {
+            opacity: 1;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        button:disabled {
+            background: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: var(--accent-color);
+        }
+        
+        .btn-secondary:hover {
+            background: #616161;
+        }
+        
+        .test-api-btn {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .test-api-btn:hover {
+            background: #f5f5f5;
+            color: #000000;
+        }
+        
+        .answer {
+            padding: 24px;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            white-space: pre-wrap;
+            min-height: 60px;
+            border-left: 4px solid var(--primary-color);
+            font-size: 16px;
+            line-height: 1.7;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .loading {
+            display: none;
+            color: var(--gray-text);
+            padding: 16px;
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            margin-top: 16px;
+            animation: pulse 2s infinite;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .error {
+            color: var(--warning-color);
+            background: #ffebee;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            display: none;
+            margin-top: 16px;
+            border-left: 4px solid var(--warning-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .config-section {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: var(--border-radius);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e0e0e0;
+            transition: all var(--animation-duration) ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .config-section:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .config-input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all var(--animation-duration) ease;
+            background-color: #fff;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        }
+        
+        .config-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(117, 117, 117, 0.1);
+        }
+        
+        .tips-section {
+            background: #eeeeee;
+            padding: 20px 24px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        
+        .tips-section::before {
+            content: '';
+            display: none;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .highlight {
+            background-color: rgba(33, 33, 33, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        code {
+            background: #eeeeee;
+            color: var(--primary-color);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .info-pill {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .config-help {
+            margin-bottom: 24px;
+            background: #eeeeee;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            border-left: 4px solid var(--accent-color);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .config-help h4 {
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        
+        .config-help h4::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .config-help h4:first-child::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23212121'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .config-help h4:nth-child(3)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23212121'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .config-help h4:nth-child(5)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23212121'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        ul, ol {
+            padding-left: 24px;
+            margin: 8px 0;
+        }
+        
+        li {
+            margin-bottom: 6px;
+        }
+        
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .container {
+                padding: 24px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        /* 添加新的样式规则 */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .status-message {
+            margin-top: 15px; 
+            color: var(--gray-text);
+            padding: 10px 0;
+            min-height: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .resume-section {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .star-method {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        
+        .example {
+            background: #eeeeee;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+        
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .optimize-btn {
+            width: 100%;
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .optimize-btn:after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(30deg);
+            transition: transform 1.5s;
+        }
+        
+        .optimize-btn:hover:after {
+            transform: rotate(30deg) translate(100%, 100%);
+        }
+        
+        .loading-content {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .loading-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .loading-text small {
+            margin-top: 5px;
+            opacity: 0.8;
+            font-size: 0.8em;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            font-size: 14px;
+            color: var(--gray-text);
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* 添加动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .container > * {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .container > *:nth-child(1) { animation-delay: 0.1s; }
+        .container > *:nth-child(2) { animation-delay: 0.2s; }
+        .container > *:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #bdbdbd;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #757575;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>AI问答助手</h1>
-        <div class="config-section">
-            <input type="text" id="apiKey" placeholder="API密钥（可选）" class="config-input">
-            <input type="text" id="baseUrl" placeholder="API地址（可选）" class="config-input">
-            <input type="text" id="model" placeholder="模型名称（可选）" class="config-input">
+        <div class="header">
+            <h1>⚡ AI简历优化助手</h1>
+            <p>利用AI技术与STAR法则，让您的简历脱颖而出，提升求职竞争力</p>
         </div>
-        <textarea id="question" placeholder="输入您的问题..."></textarea>
-        <button onclick="askQuestion()">提交问题</button>
-        <div class="loading" id="loading">正在获取答案...</div>
-        <div class="answer" id="answer"></div>
+
+        <div class="config-section">
+            <h3>API配置</h3>
+            <div class="config-help">
+                <h4>配置说明</h4>
+                <ul>
+                    <li><strong>API密钥：</strong>格式如"sk-..."，可从<a href="https://platform.openai.com/api-keys" target="_blank">OpenAI官网</a>获取</li>
+                    <li><strong>API地址：</strong>官方为"https://api.openai.com"，国内用户可使用第三方代理</li>
+                    <li><strong>模型名称：</strong>如gpt-3.5-turbo、gpt-4等，根据您的账户权限选择</li>
+                </ul>
+                
+                <h4>API路径格式说明</h4>
+                <ul>
+                    <li><span class="highlight">基础地址：</span> <code>https://域名</code> 或 <code>https://域名/v1</code></li>
+                    <li><span class="highlight">完整接口：</span> <code>https://域名/v1/chat/completions</code></li>
+                    <li>使用代理服务时，请查阅提供商文档获取正确格式</li>
+                </ul>
+                
+                <h4>常见问题解答</h4>
+                <ul>
+                    <li>如遇到<strong>"API返回非标准格式"</strong>错误，请确保API地址指向正确的API端点</li>
+                    <li>如遇到<strong>"JSON解析错误"</strong>，通常是API返回了空响应或格式不兼容</li>
+                    <li>使用<strong>"测试API连接"</strong>按钮可自动检测正确的API路径</li>
+                </ul>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="apiKey" placeholder="API密钥（格式：sk-...）" class="config-input">
+                <input type="text" id="baseUrl" placeholder="API地址（默认：https://api.openai.com）" class="config-input">
+                <input type="text" id="model" placeholder="模型名称（默认：gpt-3.5-turbo）" class="config-input">
+            </div>
+            
+            <div class="btn-group">
+                <button onclick="saveConfig()">
+                    保存配置
+                </button>
+                <button onclick="testAPIConnection()" class="test-api-btn">
+                    测试API连接
+                </button>
+            </div>
+            
+            <div id="configStatus" class="status-message"></div>
+        </div>
+
+        <div class="resume-section">
+            <h3>输入简历内容</h3>
+            <div class="tips-section">
+                <h4>使用提示</h4>
+                <p>输入您的简历项目经历，系统将使用STAR法则进行优化：</p>
+                <div class="star-method">
+                    <span class="info-pill">情境 Situation</span>
+                    <span class="info-pill">任务 Task</span>
+                    <span class="info-pill">行动 Action</span>
+                    <span class="info-pill">结果 Result</span>
+                </div>
+                <p class="example"><strong>示例：</strong>"负责公司电商平台的性能优化，解决了页面加载慢的问题"</p>
+            </div>
+            
+            <textarea id="question" placeholder="请输入需要优化的简历内容..." rows="6"></textarea>
+            
+            <button onclick="askQuestion()" class="optimize-btn">
+                <span class="btn-icon">✨</span> 优化简历
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <div class="loading-text">
+                        <span>正在优化简历内容，请稍候...</span>
+                        <small>处理时间通常需要10-30秒，取决于API响应速度</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="error" id="errorMessage"></div>
+            
+            <div class="result-container">
+                <div class="answer" id="answer"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>AI简历优化助手 · 让求职更加轻松高效</p>
+        </div>
     </div>
 
     <script>
+        // 加载保存的配置
+        async function loadConfig() {
+            // 优先从localStorage加载配置
+            const localConfig = JSON.parse(localStorage.getItem('aiConfig') || '{}');
+            
+            try {
+                // 从服务器获取最新配置
+                const response = await fetch('/get_config');
+                if (response.ok) {
+                    const serverData = await response.json();
+                    const serverConfig = serverData.config || {};
+                    
+                    // 合并配置：优先使用localStorage中的值，如果没有则使用服务器值
+                    const config = {
+                        apiKey: localConfig.apiKey || serverConfig.apiKey || '',
+                        baseUrl: localConfig.baseUrl || serverConfig.baseUrl || '',
+                        model: localConfig.model || serverConfig.model || ''
+                    };
+                    
+                    // 更新输入框
+                    document.getElementById('apiKey').value = config.apiKey;
+                    document.getElementById('baseUrl').value = config.baseUrl;
+                    document.getElementById('model').value = config.model;
+                    
+                    // 保存合并后的配置到localStorage
+                    localStorage.setItem('aiConfig', JSON.stringify(config));
+                    
+                    console.log("配置已从服务器加载");
+                } else {
+                    console.error("加载服务器配置失败");
+                    // 如果服务器请求失败，仍使用本地配置
+                    document.getElementById('apiKey').value = localConfig.apiKey || '';
+                    document.getElementById('baseUrl').value = localConfig.baseUrl || '';
+                    document.getElementById('model').value = localConfig.model || '';
+                }
+            } catch (error) {
+                console.error("加载配置错误:", error);
+                // 错误情况下使用本地配置
+                document.getElementById('apiKey').value = localConfig.apiKey || '';
+                document.getElementById('baseUrl').value = localConfig.baseUrl || '';
+                document.getElementById('model').value = localConfig.model || '';
+            }
+        }
+
+        // 保存配置到localStorage和后端
+        async function saveConfig() {
+            const configStatus = document.getElementById('configStatus');
+            configStatus.textContent = '正在保存配置...';
+            
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const baseUrl = document.getElementById('baseUrl').value.trim() || 'https://api.openai.com';
+            const model = document.getElementById('model').value.trim() || 'gpt-3.5-turbo';
+            
+            // 简单验证
+            if (!apiKey) {
+                configStatus.textContent = '请输入API密钥';
+                configStatus.style.color = 'var(--warning-color)';
+                return;
+            }
+            
+            if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+                configStatus.textContent = 'API地址必须以http://或https://开头';
+                configStatus.style.color = 'var(--warning-color)';
+                return;
+            }
+            
+            const config = {
+                apiKey: apiKey,
+                baseUrl: baseUrl,
+                model: model
+            };
+            
+            localStorage.setItem('aiConfig', JSON.stringify(config));
+            
+            try {
+                const response = await fetch('/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `请求失败，状态码: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                configStatus.textContent = '配置保存成功！';
+                configStatus.style.color = 'var(--success-color)';
+                setTimeout(() => {
+                    configStatus.textContent = '';
+                }, 3000);
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                configStatus.textContent = '配置保存失败: ' + error.message;
+                configStatus.style.color = 'var(--warning-color)';
+            }
+        }
+
+        // 页面加载时读取配置
+        document.addEventListener('DOMContentLoaded', loadConfig);
+
         async function askQuestion() {
-            const question = document.getElementById('question').value;
+            const question = document.getElementById('question').value.trim();
             const answerDiv = document.getElementById('answer');
             const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('errorMessage');
+            const submitButton = document.querySelector('button[onclick="askQuestion()"]');
             
             if (!question) {
-                alert('请输入问题');
+                alert('请输入简历内容');
                 return;
             }
 
+            // 重置显示
+            answerDiv.textContent = '';
+            errorDiv.style.display = 'none';
+            loading.style.display = 'block';
+            submitButton.disabled = true;
+            
+            // 添加动画样式
+            if (!document.querySelector('style#spinnerStyle')) {
+                const style = document.createElement('style');
+                style.id = 'spinnerStyle';
+                style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+
+            // 移除之前可能添加的时间显示
+            const oldTimeDisplay = loading.querySelector('.time-display');
+            if (oldTimeDisplay) {
+                loading.removeChild(oldTimeDisplay);
+            }
+
+            // 显示请求开始时间
+            const startTime = new Date();
+            const timeDisplay = document.createElement('div');
+            timeDisplay.className = 'time-display';
+            timeDisplay.style.marginTop = '10px';
+            timeDisplay.style.fontSize = '0.9em';
+            timeDisplay.textContent = `请求开始时间: ${startTime.toLocaleTimeString()}`;
+            loading.appendChild(timeDisplay);
+            
+            // 设置超时处理
+            let timeoutId = setTimeout(() => {
+                timeDisplay.textContent += ' - 请求时间较长，请耐心等待...';
+            }, 15000); // 15秒后显示提示
+
             try {
-                loading.style.display = 'block';
-                answerDiv.textContent = '';
+                // 从localStorage获取配置
+                const config = JSON.parse(localStorage.getItem('aiConfig') || '{}');
                 
-                const response = await fetch('/api/chat', {
+                // 优先使用输入框中的值，如果没有则使用localStorage中的值
+                const apiKey = document.getElementById('apiKey').value.trim() || config.apiKey;
+                const baseUrl = document.getElementById('baseUrl').value.trim() || config.baseUrl || 'https://api.openai.com';
+                const model = document.getElementById('model').value.trim() || config.model || 'gpt-3.5-turbo';
+                
+                if (!apiKey) {
+                    throw new Error('请先设置API密钥');
+                }
+                
+                if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+                    throw new Error('API地址格式错误，必须以http://或https://开头');
+                }
+                
+                const requestOptions = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
                         question,
-                        systemPrompt: "作为资深简历提升官，使用STAR原则（情境-Situation、任务-Task、行动-Action、结果-Result）优化以下简历内容，保持语言平实，符合岗位实际，避免行业术语，输出完整自然段：",
-                        apiKey: document.getElementById('apiKey').value,
-                        baseUrl: document.getElementById('baseUrl').value,
-                        model: document.getElementById('model').value
+                        systemPrompt: "假如你是一名资深简历提升官，请使用STAR+改写简历，并且最后提供完整输出，帮助更多应届大学生顺利找到他们的工作 输出限制： 1.请不要使用任何表情符号 2.请在一个自然段内完整输出 3.请不要过度夸大，请符合岗位实际 4.语言请说人话，平白直叙，拒绝任何行业黑话 5.请直接输出完整段落，无需解释某部分的内容",
+                        apiKey,
+                        baseUrl,
+                        model
                     })
-                });
+                };
+                
+                const response = await fetch('/chat', requestOptions);
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    let errorMessage = `请求失败，状态码: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        if (errorData && errorData.error) {
+                            errorMessage = errorData.error;
+                            
+                            // 美化常见错误信息
+                            if (errorMessage.includes('API key')) {
+                                errorMessage = 'API密钥无效或格式错误，请检查密钥是否正确';
+                            } else if (errorMessage.includes('not found') || errorMessage.includes('404')) {
+                                errorMessage = 'API地址无法访问，请检查地址是否正确';
+                            } else if (errorMessage.includes('connection') || errorMessage.includes('timeout')) {
+                                errorMessage = '连接API服务超时，请检查网络连接或使用其他API地址';
+                            } else if (errorMessage.includes('choices')) {
+                                errorMessage = 'OpenAI响应格式错误，通常是由API版本不兼容导致。请尝试使用不同的API地址或模型。';
+                            }
+                        }
+                    } catch (e) {
+                        console.error('解析错误响应失败:', e);
+                    }
+                    throw new Error(errorMessage);
+                }
 
                 const data = await response.json();
-                answerDiv.textContent = data.answer;
+                if (data && data.answer) {
+                    // 计算响应时间
+                    const endTime = new Date();
+                    const duration = Math.round((endTime - startTime) / 1000);
+                    
+                    answerDiv.textContent = data.answer;
+                    // 添加小提示，显示完成时间
+                    const timeInfo = document.createElement('div');
+                    timeInfo.style.marginTop = '15px';
+                    timeInfo.style.fontSize = '0.8em';
+                    timeInfo.style.color = 'var(--gray-text)';
+                    timeInfo.textContent = `✓ 耗时${duration}秒，于${endTime.toLocaleTimeString()}完成`;
+                    answerDiv.appendChild(timeInfo);
+                } else {
+                    throw new Error('未获取到优化结果，请检查API配置是否正确。');
+                }
             } catch (error) {
-                answerDiv.textContent = '请求失败: ' + error.message;
+                console.error('请求失败:', error);
+                errorDiv.textContent = '请求失败: ' + error.message;
+                errorDiv.style.display = 'block';
             } finally {
+                clearTimeout(timeoutId);
                 loading.style.display = 'none';
+                submitButton.disabled = false;
+            }
+        }
+
+        // 测试API连接
+        async function testAPIConnection() {
+            const configStatus = document.getElementById('configStatus');
+            configStatus.textContent = '正在测试API连接...';
+            configStatus.style.color = 'var(--gray-text)';
+            
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const baseUrl = document.getElementById('baseUrl').value.trim() || 'https://api.openai.com';
+            
+            // 基本验证
+            if (!apiKey) {
+                configStatus.textContent = '请输入API密钥';
+                configStatus.style.color = 'var(--warning-color)';
+                return;
+            }
+            
+            if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+                configStatus.textContent = 'API地址必须以http://或https://开头';
+                configStatus.style.color = 'var(--warning-color)';
+                return;
+            }
+            
+            try {
+                // 构建包含URL和API密钥的测试请求
+                const testRequest = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        baseUrl: baseUrl,
+                        testMode: true
+                    })
+                };
+                
+                configStatus.textContent = '正在连接API...';
+                
+                // 发送到后端进行测试
+                const response = await fetch('/test_api', testRequest);
+                const result = await response.json();
+                
+                if (result.success) {
+                    configStatus.textContent = `✓ 连接成功！检测到API地址: ${result.detectedUrl || baseUrl}`;
+                    configStatus.style.color = 'var(--success-color)';
+                    
+                    // 如果检测到更好的URL，更新输入框
+                    if (result.detectedUrl && result.detectedUrl !== baseUrl) {
+                        document.getElementById('baseUrl').value = result.detectedUrl;
+                        
+                        // 显示提示信息
+                        setTimeout(() => {
+                            configStatus.textContent += ' (已自动更新为正确的API地址)';
+                        }, 500);
+                    }
+                } else {
+                    configStatus.textContent = `✗ 连接失败: ${result.error}`;
+                    configStatus.style.color = 'var(--warning-color)';
+                }
+            } catch (error) {
+                console.error('API测试失败:', error);
+                configStatus.textContent = `✗ 测试失败: ${error.message}`;
+                configStatus.style.color = 'var(--warning-color)';
             }
         }
     </script>

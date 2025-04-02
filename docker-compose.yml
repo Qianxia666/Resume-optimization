@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  resume-optimizer:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-3.5-turbo}
+    volumes:
+      - ./.env:/app/.env:ro
+    restart: unless-stopped 
